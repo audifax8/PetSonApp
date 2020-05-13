@@ -6,7 +6,7 @@ import 'package:pet_son_app/src/modules/team/model.dart';
 class TeamMemberService {
 
   static Future<List<TeamMember>> loadData () async {
-    String _url = 'http://localhost:3000/api/team-member/';
+    // String _url = 'http://localhost:3000/api/team-member/';
     String _heroku = 'https://pet-son-back.herokuapp.com/api/team-member/';
     await Future.delayed(Duration(seconds: 2));
     http.Response response = await http.get(_heroku);

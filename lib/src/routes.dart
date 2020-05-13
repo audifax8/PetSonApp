@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import './pages/welcome.dart';
 import './pages/info.dart';
-import './pages/team.dart';
+import './pages/team-member-page.dart';
 
 Map<String, WidgetBuilder> getRoutes() {
   return {
@@ -10,6 +10,6 @@ Map<String, WidgetBuilder> getRoutes() {
     'info': (BuildContext context) => Info(),
     'lastAdoptions': (BuildContext context) => Welcome(),
     'petsPending': (BuildContext context) => Welcome(),
-    'team': (BuildContext context) => Team(),
+    'team': (BuildContext context) => TeamMemberPage(),
   };
 }
