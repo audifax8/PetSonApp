@@ -9,8 +9,8 @@ Map<String, WidgetBuilder> getRoutes() {
   return {
     '/': (BuildContext context) => Welcome(),
     'info': (BuildContext context) => Info(),
-    'lastAdoptions': (BuildContext context) => PetPage(true),
-    'petsPending': (BuildContext context) => PetPage(false),
+    'lastAdoptions': (BuildContext context) => PetPage(adopted: true),
+    'petsPending': (BuildContext context) => PetPage(adopted: false),
     'team': (BuildContext context) => TeamMemberPage(),
   };
 }
