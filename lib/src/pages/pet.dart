@@ -22,18 +22,26 @@ class _PetState extends State<PetPage> {
   bool _isLoading;
   int _limit;
   int _page;
-
-  ScrollController _scrollController = new ScrollController();
-
+  int _totalItemsCount;
   final PetBLoC _block = PetBLoC();
 
-  int get totalItemsCount => _block.totalCountController;
+  ScrollController _scrollController = new ScrollController();
 
   @override
   void initState() {
     super.initState();
     _adopted = widget.adopted;
     loadInitialState();
+
+    _block.isLoadingStream.listen((value) {
+      _isLoading = value;
+      setState(() {});
+    });
+
+    _block.totalItemsStream.listen((value) {
+      _totalItemsCount = value;
+      setState(() {});
+    });
 
     _scrollController.addListener(() {
       if (
@@ -42,7 +50,7 @@ class _PetState extends State<PetPage> {
       ) {
         if (!_isLoading) {
           int _shouldSearch = _limit * (_page + 1);
-          if (_shouldSearch <=  totalItemsCount) {
+          if (_shouldSearch <=  _totalItemsCount) {
             _page++;
             _isLoading = true;
             _block.submitQuery(getQueryParams());
@@ -58,6 +66,7 @@ class _PetState extends State<PetPage> {
     _isLoading = false;
     _limit = 10;
     _page = 1;
+    _totalItemsCount = 0;
     _block.loadInitialData();
     _block.submitQuery(getQueryParams());
   }
@@ -75,37 +84,31 @@ class _PetState extends State<PetPage> {
     return Scaffold(
       appBar: AppBar(
         leading: MenuIcon(),
-        title: Text(totalItemsCount.toString()),
+        title: Text('Mascotas'),
       ),
       drawer: Menu(),
       body: Stack(
         children: <Widget>[
-          DataObserver(
-            dataToObserve: _block.petsStream,
-            onSuccess: (context, data) {
-              _isLoading = false;
-              if (data.length != 0) {
-                return RefreshIndicator(
-                  onRefresh: animateRestarScreen,
-                  child: ListView.separated(
+          StreamBuilder(
+            stream: _block.petsStream,
+            builder: (BuildContext context, AsyncSnapshot<List<Pet>> snapshot) {
+              return RefreshIndicator(
+                onRefresh: animateRestarScreen,
+                child: ListView.separated(
                   controller: _scrollController,
-                  itemCount: data?.length ?? 0,
+                  itemCount: snapshot.data?.length ?? 0,
                   itemBuilder: (BuildContext context, int index) {
-                    Pet pet = data[index];
+                    Pet pet = snapshot.data[index];
                     return Center(
                       child: _drawPet(pet),
                     );
                   },
                   separatorBuilder: (context, index) => Divider(),
-                  )
-                );
-              }
-              return Center(
-                child: Text('No se encontraron resultados.'),
+                ),
               );
             },
           ),
-          // _showLoader()
+          _showLoader()
         ],
       )
     );
@@ -119,7 +122,7 @@ class _PetState extends State<PetPage> {
 
   Future animateRestarScreen() async {
     loadInitialState();
-    return Future.delayed(new Duration(seconds: 2));
+    return Future.delayed(new Duration(seconds: 1));
   }
 
   void moveScrollDown () {
@@ -161,17 +164,4 @@ class _PetState extends State<PetPage> {
     );
   }
 
-  Widget _drawTeamMember(temamMember) {
-    print(temamMember);
-    return ListTile(
-      title: Text(
-        temamMember.name
-      ),
-      subtitle: Text(
-        temamMember.description
-      ),
-      leading: CircleAvatar(),
-      onTap: () {},
-    );
-  }
 }
