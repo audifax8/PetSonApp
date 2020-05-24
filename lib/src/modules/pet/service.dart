@@ -10,7 +10,6 @@ class PetService {
 
     try {
       apiResponse = await ApiResponse.loadData(_heroku);
-      print(apiResponse);
     } catch (ex) {
       print(ex.toString());
     }

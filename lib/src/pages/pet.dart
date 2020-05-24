@@ -1,13 +1,15 @@
 import 'dart:async';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:flutter/material.dart';
-import 'package:pet_son_app/src/modules/shared/data-observer.dart';
 
 import '../components/menu.dart';
 import '../components/menu_icon.dart';
 import '../modules/pet/bloc.dart';
 import '../modules/pet/model.dart';
 
+import '../components/pet-adopted-card.dart';
+import '../components/pet-pending-card.dart';
 
 class PetPage extends StatefulWidget {
   final bool adopted;
@@ -100,7 +102,7 @@ class _PetState extends State<PetPage> {
                   itemBuilder: (BuildContext context, int index) {
                     Pet pet = snapshot.data[index];
                     return Center(
-                      child: _drawPet(pet),
+                      child: (_adopted) ? drawPetAdopted(pet) : drawPetPending(pet),
                     );
                   },
                   separatorBuilder: (context, index) => Divider(),
@@ -108,7 +110,7 @@ class _PetState extends State<PetPage> {
               );
             },
           ),
-          _showLoader()
+          _showLoader(),
         ],
       )
     );
@@ -133,6 +135,17 @@ class _PetState extends State<PetPage> {
     );
   }
 
+  _launchWhatsApp() async {
+    String phoneNumber = '+573798';
+    String message = 'hello from flutter app!!';
+    var whatsappUrl = "whatsapp://send?phone=$phoneNumber&text=$message";
+    if (await canLaunch(whatsappUrl)) {
+      await launch(whatsappUrl);
+    } else {
+      throw 'Could not launch $whatsappUrl';
+    }
+  }
+
   Widget _showLoader() {
     return _isLoading ?
       Column(
@@ -149,19 +162,6 @@ class _PetState extends State<PetPage> {
         ],
       )
       : Container();
-  }
-
-  Widget _drawPet(Pet pet) {
-    return ListTile(
-      title: Text(
-        pet.name
-      ),
-      subtitle: Text(
-        pet.description
-      ),
-      leading: CircleAvatar(),
-      onTap: () {},
-    );
   }
 
 }

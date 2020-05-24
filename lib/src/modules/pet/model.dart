@@ -11,12 +11,16 @@ class Pet {
   String deletionDate;
   bool active;
   bool adopted;
+  String adoptionComment;
+  String adoptionPicture;
 
   Pet() {
     id = '';
     avatar = 'avatar';
     description = 'description';
     name = 'name';
+    adoptionComment = '';
+    adoptionPicture = '';
   }
 
   static List<Pet> mapFromApiResponse(ApiResponse apiResponse) {
@@ -29,6 +33,8 @@ class Pet {
     id = jsonData['id'],
     avatar = jsonData['avatar'],
     description = jsonData['description'],
+    adoptionComment = jsonData['adoptionComment'],
+    adoptionPicture = jsonData['adoptionPicture'],
     name = jsonData['name'],
     active = jsonData['active'] as bool,
     adopted = jsonData['adopted'] as bool;

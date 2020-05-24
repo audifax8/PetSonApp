@@ -7,6 +7,8 @@ import '../components/menu_icon.dart';
 
 import '../modules/shared/data-observer.dart';
 
+import '../components/team-member-card.dart';
+
 class TeamMemberPage extends StatelessWidget {
 
   final TeamMemberBLoC _block = TeamMemberBLoC();
@@ -27,7 +29,7 @@ class TeamMemberPage extends StatelessWidget {
               itemCount: data?.length ?? 0,
               itemBuilder: (BuildContext context, int index) {
                 TeamMember _teamMember = data[index];
-                return _drawTeamMember(_teamMember);
+                return drawTeamMember(_teamMember);
               },
               separatorBuilder: (context, index) => Divider(),
             );
@@ -37,20 +39,6 @@ class TeamMemberPage extends StatelessWidget {
           );
         },
       )
-    );
-  }
-
-  Widget _drawTeamMember(TeamMember temamMember) {
-    print(temamMember);
-    return ListTile(
-      title: Text(
-        temamMember.name
-      ),
-      subtitle: Text(
-        temamMember.description
-      ),
-      leading: CircleAvatar(),
-      onTap: () {},
     );
   }
 }
