@@ -4,6 +4,7 @@ import './pages/welcome.dart';
 import './pages/info.dart';
 import './pages/team-member-page.dart';
 import './pages/pet.dart';
+import './pages/test.dart';
 
 Map<String, WidgetBuilder> getRoutes() {
   return {
@@ -12,5 +13,6 @@ Map<String, WidgetBuilder> getRoutes() {
     'lastAdoptions': (BuildContext context) => PetPage(adopted: true),
     'petsPending': (BuildContext context) => PetPage(adopted: false),
     'team': (BuildContext context) => TeamMemberPage(),
+    'test': (BuildContext context) => TestPage(adopted: false),
   };
 }

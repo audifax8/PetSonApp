@@ -26,6 +26,7 @@ class Menu extends StatelessWidget {
     'lastAdoptions': 'Últimas adopciones',
     'petsPending': 'Mascotas en adopción',
     'team': 'Equipo',
+    'test': 'Test',
   };
 
   @override
