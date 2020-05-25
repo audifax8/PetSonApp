@@ -10,23 +10,23 @@ class Welcome extends StatelessWidget {
   Widget build(BuildContext context) {
 
     var _config = AppConfig.of(context);
-
     return Scaffold(
       appBar: AppBar(
         leading: MenuIcon(),
         title: Text(_config.appName),
       ),
       drawer: Menu(),
-      body: Center(
+      body:
+      Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text("Click's count", style: TextStyle(fontSize: 40)),
-            Text('',  style: TextStyle(fontSize: 30)),
+            /*Text("Click's count", style: TextStyle(fontSize: 40)),
+            Text('',  style: TextStyle(fontSize: 30)),*/
             CardWithImage(),
           ]
         )
-      ),
+      )
     );
   }
 }
