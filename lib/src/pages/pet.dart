@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import 'package:flutter/material.dart';
 
@@ -10,6 +10,7 @@ import '../modules/pet/model.dart';
 
 import '../components/pet-adopted-card.dart';
 import '../components/pet-pending-card.dart';
+
 
 class PetPage extends StatefulWidget {
   final bool adopted;
@@ -25,6 +26,8 @@ class _PetState extends State<PetPage> {
   int _limit;
   int _page;
   int _totalItemsCount;
+
+  String _error;
   final PetBLoC _block = PetBLoC();
 
   ScrollController _scrollController = new ScrollController();
@@ -45,6 +48,11 @@ class _PetState extends State<PetPage> {
       setState(() {});
     });
 
+    _block.messageStream.listen((value) {
+      _error = value;
+      setState(() {});
+    });
+
     _scrollController.addListener(() {
       if (
         _scrollController.position.pixels ==
@@ -58,6 +66,8 @@ class _PetState extends State<PetPage> {
             _block.submitQuery(getQueryParams());
             moveScrollDown();
             setState(() {});
+          } else {
+            _showToast('No hay más mascotas por cargar');
           }
         }
       }
@@ -74,7 +84,7 @@ class _PetState extends State<PetPage> {
   }
 
   String getQueryParams () {
-    String _date = new DateTime.now().toIso8601String();
+    // String _date = new DateTime.now().toIso8601String();
     // return 'adopted=$_adopted&page=$_page&limit=$_limit&creationDate=$_date';
     return 'adopted=$_adopted&page=$_page&limit=$_limit';
   }
@@ -82,7 +92,6 @@ class _PetState extends State<PetPage> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         leading: MenuIcon(),
@@ -91,28 +100,18 @@ class _PetState extends State<PetPage> {
       drawer: Menu(),
       body: Stack(
         children: <Widget>[
-          StreamBuilder(
-            stream: _block.petsStream,
-            builder: (BuildContext context, AsyncSnapshot<List<Pet>> snapshot) {
-              return RefreshIndicator(
-                onRefresh: animateRestarScreen,
-                child: ListView.separated(
-                  controller: _scrollController,
-                  itemCount: snapshot.data?.length ?? 0,
-                  itemBuilder: (BuildContext context, int index) {
-                    Pet pet = snapshot.data[index];
-                    return Center(
-                      child: (_adopted) ? drawPetAdopted(pet) : drawPetPending(pet),
-                    );
-                  },
-                  separatorBuilder: (context, index) => Divider(),
-                ),
-              );
-            },
-          ),
+          _showPetsList(),
+          _showError(),
           _showLoader(),
         ],
       )
+    );
+  }
+
+  void _showToast(String message) {
+    Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_LONG,
     );
   }
 
@@ -135,15 +134,27 @@ class _PetState extends State<PetPage> {
     );
   }
 
-  _launchWhatsApp() async {
-    String phoneNumber = '+573798';
-    String message = 'hello from flutter app!!';
-    var whatsappUrl = "whatsapp://send?phone=$phoneNumber&text=$message";
-    if (await canLaunch(whatsappUrl)) {
-      await launch(whatsappUrl);
-    } else {
-      throw 'Could not launch $whatsappUrl';
-    }
+  Widget _showPetsList() {
+    return StreamBuilder(
+      stream: _block.petsStream,
+      builder: (BuildContext context, AsyncSnapshot<List<Pet>> snapshot) {
+        if (snapshot.data == null) return Column();
+        return RefreshIndicator(
+          onRefresh: animateRestarScreen,
+          child: ListView.separated(
+      controller: _scrollController,
+      itemCount: snapshot.data?.length ?? 0,
+      itemBuilder: (BuildContext context, int index) {
+        Pet pet = snapshot.data[index];
+        return Center(
+          child: (_adopted) ? drawPetAdopted(pet) : drawPetPending(pet),
+        );
+      },
+      separatorBuilder: (context, index) => Divider(),
+          ),
+        );
+      },
+    );
   }
 
   Widget _showLoader() {
@@ -161,6 +172,12 @@ class _PetState extends State<PetPage> {
           SizedBox(height: 15.0,)
         ],
       )
+      : Container();
+  }
+
+   Widget _showError() {
+    return _error != null ?
+      Center(child: Text(_error, style: TextStyle(fontSize: 20)))
       : Container();
   }
 

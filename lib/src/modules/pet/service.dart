@@ -8,11 +8,13 @@ class PetService {
     String _heroku = 'https://pet-son-back.herokuapp.com/api/pet/?$query';
     ApiResponse apiResponse;
 
-    try {
+    apiResponse = await ApiResponse.loadData(_heroku);
+    /*try {
       apiResponse = await ApiResponse.loadData(_heroku);
     } catch (ex) {
+      print('exc');
       print(ex.toString());
-    }
+    }*/
     return apiResponse;
   }
 }

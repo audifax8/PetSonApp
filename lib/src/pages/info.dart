@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:getflutter/getflutter.dart';
+import 'package:getflutter/getflutter.dart';
 
 import '../components/menu.dart';
 import '../components/menu_icon.dart';
@@ -25,6 +27,11 @@ class Info extends StatelessWidget {
   Widget _getInfo() {
     return Column(
       children: <Widget>[
+        GFListTile(
+          titleText:'Title',
+          subtitleText:'Lorem ipsum dolor sit amet, consectetur adipiscing',
+          icon: Icon(Icons.favorite)
+        ),
         Card(
           child: InkWell(
           splashColor: Colors.blue.withAlpha(30),
