@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:fluttertoast/fluttertoast.dart';
 
 import 'package:flutter/material.dart';
+import 'package:pet_son_app/src/modules/pet-type/bloc.dart';
+import 'package:pet_son_app/src/modules/pet-type/model.dart';
 
 import '../components/menu.dart';
 import '../components/menu_icon.dart';
@@ -29,6 +31,8 @@ class _PetState extends State<PetPage> {
 
   String _error;
   final PetBLoC _block = PetBLoC();
+  final PetTypeBLoC _petTypeBLoC = PetTypeBLoC();
+  List<PetType> _petTypes = [];
 
   ScrollController _scrollController = new ScrollController();
 
@@ -74,13 +78,15 @@ class _PetState extends State<PetPage> {
     });
   }
 
-  void loadInitialState() {
+  void loadInitialState() async {
     _isLoading = false;
     _limit = 10;
     _page = 1;
     _totalItemsCount = 0;
     _block.loadInitialData();
     _block.submitQuery(getQueryParams());
+    // _petTypeBLoC.submitQuery('').then((petTypes) => _petTypes = petTypes);
+    _petTypeBLoC.submitQuery('').then((petTypes) { _petTypes = petTypes; print(_petTypes); });
   }
 
   String getQueryParams () {
