@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:getflutter/getflutter.dart';
 
 import 'package:flutter/material.dart';
 import 'package:pet_son_app/src/modules/pet-type/bloc.dart';
@@ -12,7 +13,6 @@ import '../modules/pet/model.dart';
 
 import '../components/pet-adopted-card.dart';
 import '../components/pet-pending-card.dart';
-
 
 class PetPage extends StatefulWidget {
   final bool adopted;
@@ -28,19 +28,21 @@ class _PetState extends State<PetPage> {
   int _limit;
   int _page;
   int _totalItemsCount;
+  String _petTypeSelected;
 
   String _error;
   final PetBLoC _block = PetBLoC();
   final PetTypeBLoC _petTypeBLoC = PetTypeBLoC();
-  List<PetType> _petTypes = [];
+  List<PetType> _petTypes;
 
   ScrollController _scrollController = new ScrollController();
 
   @override
   void initState() {
     super.initState();
+    _petTypeBLoC.submitQuery('').then((petTypes) => _petTypes = petTypes);
     _adopted = widget.adopted;
-    loadInitialState();
+    loadInitialState('');
 
     _block.isLoadingStream.listen((value) {
       _isLoading = value;
@@ -78,21 +80,23 @@ class _PetState extends State<PetPage> {
     });
   }
 
-  void loadInitialState() async {
+  void loadInitialState(String petTypeSelected) async {
     _isLoading = false;
     _limit = 10;
     _page = 1;
     _totalItemsCount = 0;
+    _petTypeSelected = petTypeSelected;
     _block.loadInitialData();
     _block.submitQuery(getQueryParams());
-    // _petTypeBLoC.submitQuery('').then((petTypes) => _petTypes = petTypes);
-    _petTypeBLoC.submitQuery('').then((petTypes) { _petTypes = petTypes; print(_petTypes); });
   }
 
   String getQueryParams () {
     // String _date = new DateTime.now().toIso8601String();
     // return 'adopted=$_adopted&page=$_page&limit=$_limit&creationDate=$_date';
-    return 'adopted=$_adopted&page=$_page&limit=$_limit';
+    String petTypeSelected = (_petTypeSelected != '' && _petTypeSelected != null) ? 'petType=$_petTypeSelected' : '';
+    String url = 'adopted=$_adopted&page=$_page&limit=$_limit&$petTypeSelected';
+    print(url);
+    return url;
   }
 
 
@@ -110,7 +114,74 @@ class _PetState extends State<PetPage> {
           _showError(),
           _showLoader(),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _openSearchModal(context),
+        tooltip: 'Buscar',
+        child: Icon(Icons.search),
       )
+    );
+  }
+
+  void _openSearchModal(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+    print(width);
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) {
+        return AlertDialog(
+          title: Center( child: Text('Seleccione el tipo de mascota.'),),
+          content: Container(
+            height: 200.0,
+            width: 200.0,
+            child: _drawPetTypes(),
+          ),
+          actions: <Widget>[
+            FloatingActionButton(
+              child: Icon(Icons.clear),
+              onPressed: () {
+                loadInitialState('');
+                Navigator.of(context).pop();
+              }
+            ),
+            /*FloatingActionButton(
+              child: Text('Buscar.'),
+              onPressed: () {
+                loadInitialState(_petTypeSelected);
+                Navigator.of(context).pop();
+              },
+            )*/
+          ],
+        );
+      }
+    );
+  }
+
+  Widget _drawPetTypes() {
+    return ListView.separated(
+      itemCount: _petTypes?.length ?? 0,
+      itemBuilder: (BuildContext context, int index) {
+        PetType _petType = _petTypes[index];
+        return Container(
+          color: (_petTypeSelected == _petType.id) ? Colors.blue : null,
+          //color: Colors.blue,
+          child: ListTile(
+            title: Text(
+              _petType.name,
+              style: TextStyle(color: (_petTypeSelected == _petType.id) ? Colors.white : Colors.black),
+            ),
+            leading: GFAvatar(
+              backgroundImage: NetworkImage(_petType.avatar),
+            ),
+            onTap: () {
+              loadInitialState(_petType.id);
+              Navigator.of(context).pop();
+            }
+          ),
+        );
+      },
+      separatorBuilder: (context, index) => Divider(),
     );
   }
 
@@ -125,10 +196,11 @@ class _PetState extends State<PetPage> {
   void dispose() {
     super.dispose();
     _scrollController.dispose();
+    Fluttertoast.cancel();
   }
 
   Future animateRestarScreen() async {
-    loadInitialState();
+    loadInitialState('');
     return Future.delayed(new Duration(seconds: 1));
   }
 
@@ -148,15 +220,15 @@ class _PetState extends State<PetPage> {
         return RefreshIndicator(
           onRefresh: animateRestarScreen,
           child: ListView.separated(
-      controller: _scrollController,
-      itemCount: snapshot.data?.length ?? 0,
-      itemBuilder: (BuildContext context, int index) {
-        Pet pet = snapshot.data[index];
-        return Center(
-          child: (_adopted) ? drawPetAdopted(pet) : drawPetPending(pet),
-        );
-      },
-      separatorBuilder: (context, index) => Divider(),
+            controller: _scrollController,
+            itemCount: snapshot.data?.length ?? 0,
+            itemBuilder: (BuildContext context, int index) {
+              Pet pet = snapshot.data[index];
+              return Center(
+                child: (_adopted) ? drawPetAdopted(pet) : drawPetPending(pet),
+              );
+            },
+            separatorBuilder: (context, index) => Divider(),
           ),
         );
       },
@@ -183,7 +255,10 @@ class _PetState extends State<PetPage> {
 
    Widget _showError() {
     return _error != null ?
-      Center(child: Text(_error, style: TextStyle(fontSize: 20)))
+      RefreshIndicator(
+          onRefresh: animateRestarScreen,
+          child: Center(child: Text(_error, style: TextStyle(fontSize: 20)))
+      )
       : Container();
   }
 

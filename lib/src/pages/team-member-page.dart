@@ -35,7 +35,7 @@ class TeamMemberPage extends StatelessWidget {
             );
           }
           return Center(
-            child: Text('No se encontraron resultados.'),
+            child: Text('No se encontraron resultados.', style: TextStyle(fontSize: 20)),
           );
         },
       )

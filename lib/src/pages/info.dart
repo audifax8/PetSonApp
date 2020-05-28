@@ -29,19 +29,15 @@ class Info extends StatelessWidget {
         Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            _getInfo(),
-            GFListTile(
-              titleText:'Jornadas de Adopción',
-              subtitleText:'Vista previa de nuestras últimas jornadas de adopción',
-              // icon: Icon(Icons.favorite)
-            ),
+            _drawPetSonInfo(),
+            _drawAdoptionsInfo(),
             _drawCarousel(),
           ]
         )
       );
   }
 
-  Widget _getInfo() {
+  Widget _drawPetSonInfo() {
     return GFCard(
       boxFit: BoxFit.cover,
       // imageOverlay: AssetImage('your asset image'),
@@ -50,15 +46,27 @@ class Info extends StatelessWidget {
         title: Text('PetSon'),
         subTitle: Text('¿Qué pretende esta App?'),
       ),
-      content: Text("Queremos ayudarte a encontrar tu mascoja, o como nosotros lo llamamos, tu futuro hijo."),
-      /*buttonBar: GFButtonBar(
+      content: Text("Queremos ayudarte a encontrar tu mascota, o como nosotros lo llamamos, tu futuro hijo."),
+      buttonBar: GFButtonBar(
         children: <Widget>[
           GFButton(
-            onPressed: () => _launchURL,
-            text: 'View',
+            onPressed: () => _openPetSonWebPage(),
+            text: 'Visitar página web',
           )
         ],
-      ),*/
+      ),
+    );
+  }
+
+  Widget _drawAdoptionsInfo() {
+    return GFCard(
+      boxFit: BoxFit.cover,
+      // imageOverlay: AssetImage('your asset image'),
+      title: GFListTile(
+        avatar: Icon(Icons.pets),
+        title: Text('Jornadas de Adopción'),
+      ),
+      content: Text('Imágenes de nuestras últimas jornadas de adopción'),
     );
   }
 
@@ -87,8 +95,8 @@ class Info extends StatelessWidget {
     );
   }
 
-  _launchURL() async {
-    const url = 'https://flutter.io';
+  _openPetSonWebPage() async {
+    const url = 'https://audifax8.github.io/pet-son-landing/#/home';
     if (await canLaunch(url)) {
       await launch(url);
     } else {
