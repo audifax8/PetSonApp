@@ -30,7 +30,7 @@ _openWSP(Pet pet) async {
   try {
     String phoneNumber = '+573212975798';
     String _message = 'Hola! quisiera saber sobre la mascota ${pet.name}.';
-    whatsappUrl = "whatsapp://send?phone=$phoneNumber&text=$_message";
+    whatsappUrl = "https://api.whatsapp.com/send?phone=$phoneNumber&text=$_message";
     if (await canLaunch(whatsappUrl)) {
       await launch(whatsappUrl);
     }
